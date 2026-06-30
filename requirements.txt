@@ -1,0 +1,26 @@
+# Web framework
+fastapi==0.115.*
+uvicorn[standard]==0.32.*
+pydantic==2.*
+pydantic-settings==2.*
+python-multipart==0.0.*
+
+# Persistencia
+sqlalchemy==2.*
+psycopg[binary]==3.*
+
+# Autenticación
+python-jose[cryptography]==3.*
+passlib[bcrypt]==1.7.*
+
+# Capa de inteligencia
+sympy==1.13.*
+httpx==0.27.*
+
+# Almacenamiento de objetos
+boto3==1.35.*
+
+# Calidad (desarrollo)
+ruff==0.7.*
+black==24.*
+pytest==8.*
