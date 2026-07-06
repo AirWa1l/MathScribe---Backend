@@ -24,5 +24,7 @@ class RecognitionService:
     def __init__(self, provider: RecognitionProvider | None = None) -> None:
         self._provider = provider or _build_provider()
 
-    async def recognize(self, image_bytes: bytes, *, filename: str | None = None) -> RecognitionResponse:
+    async def recognize(
+        self, image_bytes: bytes, *, filename: str | None = None
+    ) -> RecognitionResponse:
         return await self._provider.recognize(image_bytes, filename=filename)

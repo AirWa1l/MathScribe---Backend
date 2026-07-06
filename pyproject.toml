@@ -14,6 +14,21 @@ target-version = "py311"
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B"]
 
+[tool.ruff.lint.flake8-bugbear]
+# Las dependencias de FastAPI se declaran como valores por defecto de los
+# argumentos; no son mutables ni tienen efectos secundarios (no aplica B008).
+extend-immutable-calls = [
+    "fastapi.File",
+    "fastapi.Form",
+    "fastapi.Body",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Header",
+    "fastapi.Cookie",
+    "fastapi.Depends",
+    "fastapi.Security",
+]
+
 [tool.black]
 line-length = 100
 target-version = ["py311"]

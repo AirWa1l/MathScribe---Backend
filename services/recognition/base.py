@@ -15,6 +15,8 @@ class RecognitionProvider(ABC):
     name: str = "base"
 
     @abstractmethod
-    async def recognize(self, image_bytes: bytes, *, filename: str | None = None) -> RecognitionResponse:
+    async def recognize(
+        self, image_bytes: bytes, *, filename: str | None = None
+    ) -> RecognitionResponse:
         """Convierte los bytes de una imagen en una expresión LaTeX."""
         raise NotImplementedError

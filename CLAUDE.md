@@ -33,6 +33,21 @@ pytest                          # pruebas
 ruff check . && black .         # lint y formato
 ```
 
+## Verificación antes de commit (obligatoria)
+
+Antes de crear cualquier commit, ejecuta los mismos checks que corre el pipeline
+(`.github/workflows/ci.yml`) y confirma que los tres pasan en verde. Nunca se hace
+commit con alguno de estos fallando; corrige la causa primero.
+
+```bash
+ruff check .        # lint (0 errores)
+black --check .     # formato (sin reformateos pendientes)
+pytest              # pruebas (todas en verde)
+```
+
+Si `black --check .` reporta archivos, aplica `black .` y vuelve a verificar.
+Esto evita romper el pipeline al empujar la rama.
+
 ## Convenciones
 
 - Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`…).
