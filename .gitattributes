@@ -1,0 +1,24 @@
+# Normaliza los finales de línea: el repositorio guarda LF.
+# Evita los avisos "LF will be replaced by CRLF" en Windows y mantiene
+# consistencia con el pipeline (Ubuntu) y con black/ruff.
+* text=auto eol=lf
+
+# Archivos de texto del proyecto: siempre LF.
+*.py    text eol=lf
+*.toml  text eol=lf
+*.txt   text eol=lf
+*.md    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.cfg   text eol=lf
+*.ini   text eol=lf
+*.json  text eol=lf
+*.env   text eol=lf
+Dockerfile text eol=lf
+
+# Binarios: sin normalización.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
