@@ -3,6 +3,7 @@
 from app.core.config import settings
 from app.schemas.recognition import RecognitionResponse
 from services.recognition.base import RecognitionProvider
+from services.recognition.preprocessing import preprocess
 from services.recognition.providers.gemini import GeminiProvider
 from services.recognition.providers.mathpix import MathpixProvider
 from services.recognition.providers.openai_vision import OpenAIVisionProvider
@@ -27,4 +28,7 @@ class RecognitionService:
     async def recognize(
         self, image_bytes: bytes, *, filename: str | None = None
     ) -> RecognitionResponse:
-        return await self._provider.recognize(image_bytes, filename=filename)
+        # Paso de visión open source (OpenCV) antes de delegar en el proveedor
+        # multimodal: limpia la imagen para mejorar el reconocimiento del LaTeX.
+        processed = preprocess(image_bytes)
+        return await self._provider.recognize(processed, filename=filename)
