@@ -63,11 +63,21 @@ uvicorn app.main:app --reload
 
 La documentación interactiva queda disponible en `http://localhost:8000/docs`.
 
-> ⚠️ Andamiaje inicial: los servicios devuelven respuestas de ejemplo. La integración real
-> con los proveedores de IA y la base de datos se implementa en historias posteriores.
+> Sin `GEMINI_API_KEY` la API arranca igual: el reconocimiento devuelve LaTeX vacío
+> y la explicación conserva los pasos de SymPy, en lugar de fallar. La resolución
+> simbólica funciona sin ninguna credencial.
+
+## Despliegue
+
+Desplegado en Render como servicio Docker, con PostgreSQL administrado y
+despliegue disparado por el pipeline tras pasar lint, pruebas y cobertura.
+
+- Infraestructura como código: [`render.yaml`](./render.yaml)
+- Configuración, secretos y nota sobre permisos de la cuenta:
+  [`docs/devops/despliegue-y-permisos.md`](./docs/devops/despliegue-y-permisos.md)
 
 ## Convenciones
 
-- Ramas: `main` protegida; `feature/*`, `fix/*`.
-- Commits: [Conventional Commits](https://www.conventionalcommits.org/).
-- Cada PR ejecuta linters y pruebas antes de fusionar.
+- Ramas: `main` protegida; `feature/*`, `fix/*`, `ci/*`, `docs/*`, `chore/*`.
+- Commits: [Conventional Commits](https://www.conventionalcommits.org/), en español.
+- Cada PR ejecuta linters, pruebas y umbral de cobertura antes de fusionar.
