@@ -11,7 +11,10 @@ class Settings(BaseSettings):
     environment: str = "development"
     debug: bool = True
     api_v1_prefix: str = "/api/v1"
-    cors_origins: list[str] = ["http://localhost:5173"]
+    # Se declara como cadena separada por comas (no como lista) porque las
+    # plataformas de despliegue sólo inyectan texto plano en las variables de
+    # entorno. `cors_origins_list` entrega la lista ya normalizada.
+    cors_origins: str = "http://localhost:5173"
 
     # Base de datos
     database_url: str = "postgresql+psycopg://mathscribe:mathscribe@localhost:5432/mathscribe"
@@ -34,6 +37,26 @@ class Settings(BaseSettings):
     s3_access_key: str | None = None
     s3_secret_key: str | None = None
     s3_region: str = "us-east-1"
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        """Orígenes permitidos para CORS, a partir de la cadena separada por comas."""
+        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
+    @property
+    def sqlalchemy_database_url(self) -> str:
+        """URL de base de datos con el driver explícito que espera SQLAlchemy.
+
+        Los proveedores administrados (Render, Heroku) entregan la cadena con el
+        esquema `postgresql://` o `postgres://`; SQLAlchemy necesita que se
+        indique el driver `psycopg` para no recurrir al obsoleto psycopg2.
+        """
+        url = self.database_url
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql://", 1)
+        if url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+psycopg://", 1)
+        return url
 
 
 settings = Settings()

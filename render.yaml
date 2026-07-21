@@ -1,0 +1,53 @@
+# Blueprint de Render (Infraestructura como Código) — MathScribe API
+#
+# Define la API y su base de datos PostgreSQL administrada. Render lee este
+# archivo al conectar el repositorio y crea ambos recursos automáticamente.
+#
+# Variables marcadas con `sync: false` NO se versionan: se cargan como secretos
+# en el panel de Render al aplicar el Blueprint.
+
+databases:
+  - name: mathscribe-db
+    databaseName: mathscribe
+    user: mathscribe
+    plan: free
+
+services:
+  - type: web
+    name: mathscribe-api
+    runtime: docker
+    dockerfilePath: ./infra/Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # Cadena de conexión inyectada por Render desde la base de datos anterior.
+      # `config.py` normaliza el prefijo a `postgresql+psycopg://` para SQLAlchemy.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mathscribe-db
+          property: connectionString
+
+      # Capa de inteligencia
+      - key: RECOGNITION_PROVIDER
+        value: gemini
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_COST_PER_1K_TOKENS
+        value: "0.0003"
+
+      # Autenticación
+      - key: JWT_SECRET
+        sync: false
+
+      # Aplicación
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: CORS_ORIGINS
+        value: https://mathscribe-web.onrender.com
