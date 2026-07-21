@@ -100,7 +100,8 @@ explicaciones didácticas y advertencia explícita de verificar los resultados.
 ## 5. Riesgos
 
 El registro completo, con probabilidad, impacto y mitigación, está en
-[`riesgos.md`](./riesgos.md) del repositorio de frontend (R-01 a R-10). Los tres
+[`riesgos.md`](https://github.com/AirWa1l/MathScribe---Frontend/blob/main/docs/product/riesgos.md)
+del repositorio de frontend (R-01 a R-10). Los tres
 riesgos que más condicionaron el diseño:
 
 | Riesgo | Por qué es crítico | Mitigación adoptada |
