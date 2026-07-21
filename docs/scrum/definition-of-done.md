@@ -40,6 +40,22 @@ pytest              # pruebas (todas en verde)
 Si `black --check .` reporta archivos, se aplica `black .` y se vuelve a
 verificar antes de commitear.
 
+## Criterios añadidos en el Sprint 3
+
+Estos criterios se incorporaron al comprobar, durante el sprint, que su ausencia
+permitía que entraran regresiones:
+
+7. **La cobertura de pruebas no baja del umbral.** El pipeline ejecuta
+   `pytest --cov --cov-fail-under=85` y falla por debajo de ese valor. El umbral
+   se elevó desde el 50% inicial al medirse una cobertura real del 96%: deja
+   margen y a la vez impide que una regresión pase inadvertida.
+8. **El cambio llega desplegado.** Un merge a `main` que pasa la validación
+   dispara el despliegue mediante el Deploy Hook. Una tarea no está terminada
+   hasta que su efecto es observable en el entorno público.
+9. **Las afirmaciones documentales son verificables.** En la documentación no se
+   incluyen cifras estimadas cuando existe una medición disponible; las que
+   provienen de una fuente externa se enlazan.
+
 ## Notas
 
 - Convención de commits: **Conventional Commits** (`feat:`, `fix:`, `docs:`,
