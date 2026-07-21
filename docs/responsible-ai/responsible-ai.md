@@ -208,11 +208,39 @@ plan gratuito, además, el servicio tarda en despertar tras inactividad.
 | 11 | Error detectado pero no corregible | Edición manual del LaTeX | ⏳ Pendiente |
 | 12 | Sesgo de caligrafía y notación regional | Evaluación documentada y configuración regional | ⏳ Pendiente |
 | 13 | Dependencia del estudiante | Mensaje de uso responsable y modo "sólo pistas" | ⏳ Pendiente |
+| 14 | Telemetría accesible sin autenticación | Restringir `/metrics` a personal autorizado | ⏳ Pendiente (decisión consciente, ver §7.1) |
 
-Nueve mitigaciones operativas y cuatro pendientes explícitas. Las pendientes no
+Nueve mitigaciones operativas y cinco pendientes explícitas. Las pendientes no
 son omisiones descubiertas al escribir el documento: son decisiones de alcance
 tomadas con el calendario del proyecto a la vista, y quedan registradas para que
 cualquiera que retome el sistema sepa qué falta y por qué.
+
+### 7.1 Sobre la exposición pública de las métricas
+
+El endpoint `GET /api/v1/metrics` y el panel que lo consume son accesibles sin
+autenticación en el despliegue público. **Es una decisión deliberada, no un
+descuido**, y conviene dejarla razonada.
+
+Lo que se expone es telemetría operativa agregada: número de peticiones,
+latencia, uso de CPU y memoria del proceso, y tokens y costo acumulados. **No se
+expone ningún dato personal**: ni imágenes, ni expresiones reconocidas, ni
+identificadores de usuario. Tampoco credenciales ni rutas internas no
+documentadas —la propia API es pública y está descrita en `/docs`.
+
+La razón de mantenerlo abierto es de transparencia y verificabilidad: cualquiera
+puede comprobar el desempeño y el costo real del sistema en lugar de confiar en
+las cifras que reporta este documento. En un proyecto académico cuyo objetivo es
+justamente evidenciar la medición, ocultarla sería contraproducente.
+
+El riesgo residual es de **divulgación de información operativa**: un tercero
+podría inferir el volumen de uso o el gasto en la API, y consultar el endpoint
+de forma repetida para inflar el tráfico. Ninguno de los dos compromete a los
+usuarios ni sus datos.
+
+En un despliegue de producción real la recomendación es la contraria: restringir
+el endpoint a personal autorizado, mediante autenticación o exponiéndolo sólo en
+una red interna, y conservar la telemetría en un sistema de observabilidad en
+lugar de en memoria del proceso.
 
 ---
 
