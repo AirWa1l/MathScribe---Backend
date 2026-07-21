@@ -10,12 +10,17 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.core.metrics import middleware_metricas
 
 app = FastAPI(
     title=settings.app_name,
     version="0.1.0",
     description="Agente visual multimodal: imagen → LaTeX, resolución y explicación paso a paso.",
 )
+
+# El middleware de métricas se registra primero para que su medición incluya el
+# tiempo que consumen los demás middlewares de la cadena.
+app.middleware("http")(middleware_metricas)
 
 app.add_middleware(
     CORSMiddleware,
