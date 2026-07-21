@@ -16,6 +16,8 @@ passlib[bcrypt]==1.7.*
 # Capa de inteligencia
 google-genai==1.*
 sympy==1.13.*
+# Requerido por sympy.parsing.latex para interpretar el LaTeX reconocido.
+antlr4-python3-runtime==4.11.*
 httpx==0.27.*
 
 # Visión open source (preprocesamiento antes del proveedor multimodal)
