@@ -69,16 +69,42 @@ class TestConfiguracionDeGeneracion:
 
         assert getattr(configuracion, "thinking_config", None) is None
 
-    def test_con_presupuesto_cero_desactiva_el_razonamiento(
+    def test_con_presupuesto_definido_se_envia_configuracion_de_razonamiento(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """Es la palanca para abaratar la transcripción, que no lo necesita."""
+        """Es la palanca para abaratar la transcripción, que no lo necesita.
+
+        Se comprueba que la configuración viaja, sin exigir un campo concreto:
+        el SDK expresa el razonamiento como número de tokens o como nivel según
+        la versión, y el código se adapta a la que esté instalada.
+        """
         monkeypatch.setattr(gemini_client.settings, "gemini_thinking_budget", 0)
 
         configuracion = config_generacion()
 
         assert configuracion.thinking_config is not None
-        assert configuracion.thinking_config.thinking_budget == 0
+
+    @pytest.mark.parametrize("presupuesto", [0, 512, 8192])
+    def test_cualquier_presupuesto_produce_una_configuracion_valida(
+        self, monkeypatch: pytest.MonkeyPatch, presupuesto: int
+    ) -> None:
+        """Ningún valor razonable debe hacer fallar la construcción."""
+        monkeypatch.setattr(gemini_client.settings, "gemini_thinking_budget", presupuesto)
+
+        assert config_generacion() is not None
+
+    def test_si_el_sdk_no_soporta_el_ajuste_no_se_rompe(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Ante una versión que no lo permita, se sigue con el valor por defecto."""
+
+        class _ThinkingConfigSinCampos:
+            model_fields: dict[str, object] = {}
+
+        class _TiposFalsos:
+            ThinkingConfig = _ThinkingConfigSinCampos
+
+        assert gemini_client._config_razonamiento(_TiposFalsos, 0) is None
 
 
 def test_envuelve_la_imagen_con_el_tipo_declarado() -> None:
