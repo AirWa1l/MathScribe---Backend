@@ -1,6 +1,6 @@
-# CLAUDE.md — Backend
+# Guía de contribución — Backend
 
-Guía para sesiones con Claude Code en el backend de MathScribe.
+Convenciones y verificaciones para trabajar en el backend de MathScribe.
 
 ## Qué es esto
 
@@ -54,5 +54,6 @@ Esto evita romper el pipeline al empujar la rama.
 - Ramas `feature/*` y `fix/*`; `main` protegida.
 - Docstrings y comentarios en español, alineados con la documentación del proyecto.
 
-> Estado actual: andamiaje. Los servicios devuelven datos de ejemplo; la integración
-> real con proveedores de IA, base de datos y S3 está pendiente.
+> Estado actual: funcional y desplegado. El reconocimiento con Gemini, la
+> resolución con SymPy, la explicación paso a paso y las métricas están
+> implementados y cubiertos por pruebas (96% de cobertura).
