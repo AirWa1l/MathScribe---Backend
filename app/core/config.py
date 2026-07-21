@@ -27,6 +27,13 @@ class Settings(BaseSettings):
     # Capa de inteligencia
     recognition_provider: str = "gemini"
     gemini_api_key: str | None = None
+    gemini_model: str = "gemini-3.5-flash"
+    # Tokens que el modelo puede gastar razonando antes de responder. En los
+    # modelos 3.x el razonamiento se factura, y transcribir una expresión no lo
+    # necesita. `None` deja el valor por defecto del modelo; 0 lo desactiva.
+    gemini_thinking_budget: int | None = None
+    # Tarifa estimada por cada 1000 tokens, usada en el análisis de costos.
+    gemini_cost_per_1k_tokens: float = 0.0003
     openai_api_key: str | None = None
     mathpix_app_id: str | None = None
     mathpix_app_key: str | None = None
