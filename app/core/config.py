@@ -32,8 +32,11 @@ class Settings(BaseSettings):
     # modelos 3.x el razonamiento se factura, y transcribir una expresión no lo
     # necesita. `None` deja el valor por defecto del modelo; 0 lo desactiva.
     gemini_thinking_budget: int | None = None
-    # Tarifa estimada por cada 1000 tokens, usada en el análisis de costos.
-    gemini_cost_per_1k_tokens: float = 0.0003
+    # Tarifas por cada 1000 tokens (gemini-3.5-flash: 1,50 USD y 9,00 USD por
+    # millón). Se separan porque la salida cuesta seis veces más que la entrada,
+    # y los tokens de razonamiento se facturan como salida.
+    gemini_input_cost_per_1k: float = 0.0015
+    gemini_output_cost_per_1k: float = 0.009
     openai_api_key: str | None = None
     mathpix_app_id: str | None = None
     mathpix_app_key: str | None = None

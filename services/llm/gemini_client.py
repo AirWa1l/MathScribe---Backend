@@ -65,8 +65,20 @@ class ConsumoTokens:
         )
 
     def costo_estimado_usd(self) -> float:
-        """Costo estimado según la tarifa configurada por cada 1000 tokens."""
-        return round(self.tokens_totales / 1000 * settings.gemini_cost_per_1k_tokens, 6)
+        """Costo estimado aplicando tarifas distintas a la entrada y a la salida.
+
+        Los tokens de razonamiento se facturan como salida, no como entrada. Es
+        una distinción que cambia el resultado por completo: en este modelo la
+        salida cuesta seis veces más que la entrada, y el razonamiento suele
+        superar con creces al texto que finalmente se devuelve.
+        """
+        entrada = self.tokens_entrada / 1000 * settings.gemini_input_cost_per_1k
+        salida = (
+            (self.tokens_salida + self.tokens_razonamiento)
+            / 1000
+            * settings.gemini_output_cost_per_1k
+        )
+        return round(entrada + salida, 6)
 
     def resumen(self) -> dict[str, float | int]:
         """Instantánea del consumo, apta para exponer en el endpoint de métricas."""
