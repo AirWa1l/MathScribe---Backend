@@ -136,6 +136,14 @@ cada petición y muestrea recursos del proceso. `GET /api/v1/metrics` expone:
 | Latencia | p50, p95, máximo y promedio, con desglose por ruta |
 | Recursos | CPU y memoria residente del proceso |
 | Consumo | Llamadas, tokens de entrada, salida y razonamiento, costo estimado |
+| GPU | **No aplica**: ver más abajo |
+
+**Sobre la GPU.** El sistema no consume GPU propia. La única etapa que requiere
+cómputo acelerado —la inferencia del modelo multimodal— se ejecuta en la
+infraestructura de Google, que factura por tokens y no expone utilización de
+hardware. Nuestro servicio corre íntegramente en CPU: OpenCV y SymPy no la
+necesitan. Por eso el costo del cómputo acelerado aparece en el análisis
+económico como gasto de API, no como una métrica de hardware.
 
 **El desglose por ruta es lo que permite comparar** el costo temporal del
 reconocimiento —que incluye visión más una llamada al modelo— frente al de la

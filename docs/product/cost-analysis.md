@@ -24,6 +24,28 @@ razonamiento —los que el modelo consume "pensando" antes de responder— se
 facturan a tarifa de salida. Esto es lo que domina la factura y lo que motivó
 corregir el modelo de costos del sistema (ver §5).
 
+## 1.1 Sobre el uso de GPU
+
+El sistema **no consume GPU propia, y es una consecuencia directa de su
+arquitectura**, no una omisión de la medición.
+
+| Etapa | Dónde se ejecuta | Recurso |
+|---|---|---|
+| Preprocesamiento y ROI (OpenCV) | Nuestro servidor | CPU |
+| Reconocimiento y explicación (Gemini) | Infraestructura de Google | GPU/TPU **de Google**, facturada por tokens |
+| Resolución simbólica (SymPy) | Nuestro servidor | CPU |
+
+La única etapa que requiere aceleración por hardware está delegada en el
+proveedor del modelo, que no expone métricas de GPU sino consumo de tokens. Por
+eso el análisis de desempeño mide CPU y memoria del proceso, y el costo del
+cómputo acelerado aparece como gasto de API en lugar de como utilización de
+hardware.
+
+Es también la razón de que la operación sea barata: **el proyecto no sostiene
+ninguna GPU**. Un modelo de visión autoalojado eliminaría el costo por llamada,
+pero exigiría una instancia con GPU —del orden de 300 USD al mes— que sólo
+compensaría a un volumen muy superior al previsto (ver §6).
+
 ## 2. Consumo por operación
 
 Medido en pruebas contra el modelo real, con imágenes ya recortadas por OpenCV:
