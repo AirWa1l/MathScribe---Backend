@@ -106,6 +106,21 @@ infraestructura descrita en `render.yaml` de una sola vez.
 
 No se requiere ningún cambio en el código, el `render.yaml` ni el pipeline.
 
+## 4.1 Endpoint de métricas sin autenticación
+
+`GET /api/v1/metrics` responde a cualquiera en el despliegue público. Es
+intencional: sostiene el panel de métricas de la interfaz y permite verificar el
+desempeño real del sistema sin necesidad de credenciales.
+
+Sólo devuelve agregados operativos —peticiones, latencia, CPU, memoria, tokens y
+costo—; no expone imágenes, expresiones reconocidas, usuarios ni secretos. El
+análisis del riesgo residual está en
+[`../responsible-ai/responsible-ai.md`](../responsible-ai/responsible-ai.md) §7.1.
+
+Para cerrarlo en un entorno productivo bastaría con exigir una cabecera de
+autorización en el router de métricas y enviarla desde el panel, o no montar ese
+router cuando `ENVIRONMENT=production`.
+
 ## 5. Limitaciones conocidas del plan gratuito
 
 Relevantes para la demostración en vivo:
