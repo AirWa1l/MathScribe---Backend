@@ -26,5 +26,37 @@ jobs:
       - name: Formato (Black)
         run: black --check .
 
-      - name: Pruebas (Pytest)
-        run: pytest
+      # El umbral de cobertura es un requisito del proyecto (mínimo 50%): si baja,
+      # el pipeline falla y el cambio no llega a main.
+      - name: Pruebas y cobertura (Pytest)
+        run: >-
+          pytest --cov=app --cov=services --cov=shared
+          --cov-report=term-missing --cov-report=xml
+          --cov-fail-under=50
+
+      - name: Publicar reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-backend
+          path: coverage.xml
+          if-no-files-found: ignore
+
+  deploy:
+    # Sólo despliega lo que ya pasó validación, y nunca desde un pull request.
+    needs: lint-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar despliegue en Render
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "::warning::No hay RENDER_DEPLOY_HOOK_URL configurado; se omite el despliegue."
+            exit 0
+          fi
+          echo "Notificando a Render el commit ${GITHUB_SHA::7}…"
+          curl --fail --silent --show-error --location \
+            --request POST "$RENDER_DEPLOY_HOOK_URL"
+          echo "Despliegue solicitado correctamente."
