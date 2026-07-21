@@ -32,7 +32,7 @@ jobs:
         run: >-
           pytest --cov=app --cov=services --cov=shared
           --cov-report=term-missing --cov-report=xml
-          --cov-fail-under=50
+          --cov-fail-under=85
 
       - name: Publicar reporte de cobertura
         if: always()
