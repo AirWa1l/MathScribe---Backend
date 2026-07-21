@@ -143,16 +143,36 @@ class TestContabilidadDeConsumo:
 
         assert contador.resumen()["tokens_totales"] == 35
 
-    def test_el_costo_es_proporcional_a_la_tarifa(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        monkeypatch.setattr(gemini_client.settings, "gemini_cost_per_1k_tokens", 0.001)
+    def test_la_salida_se_tarifa_aparte_de_la_entrada(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setattr(gemini_client.settings, "gemini_input_cost_per_1k", 0.001)
+        monkeypatch.setattr(gemini_client.settings, "gemini_output_cost_per_1k", 0.010)
 
         class _Uso:
-            prompt_token_count = 0
-            candidates_token_count = 0
+            prompt_token_count = 1000
+            candidates_token_count = 1000
             thoughts_token_count = 0
             total_token_count = 2000
 
         contador = ConsumoTokens()
         contador.registrar(_Uso())
 
-        assert contador.costo_estimado_usd() == pytest.approx(0.002)
+        # 1000 de entrada a 0,001 + 1000 de salida a 0,010.
+        assert contador.costo_estimado_usd() == pytest.approx(0.011)
+
+    def test_el_razonamiento_se_factura_como_salida(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Contarlo como entrada subestimaría el costo casi siete veces."""
+        monkeypatch.setattr(gemini_client.settings, "gemini_input_cost_per_1k", 0.0015)
+        monkeypatch.setattr(gemini_client.settings, "gemini_output_cost_per_1k", 0.009)
+
+        class _UsoConRazonamiento:
+            prompt_token_count = 0
+            candidates_token_count = 0
+            thoughts_token_count = 1000
+            total_token_count = 1000
+
+        contador = ConsumoTokens()
+        contador.registrar(_UsoConRazonamiento())
+
+        assert contador.costo_estimado_usd() == pytest.approx(0.009)
