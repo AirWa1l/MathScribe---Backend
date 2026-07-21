@@ -108,17 +108,55 @@ def parte_imagen(data: bytes, mime_type: str = "image/png"):
     return types.Part.from_bytes(data=data, mime_type=mime_type)
 
 
+def _config_razonamiento(types, presupuesto: int):
+    """Traduce el presupuesto de razonamiento al campo que soporte el SDK.
+
+    El SDK ha cambiado de forma de expresarlo: unas versiones aceptan un número
+    de tokens (`thinking_budget`) y otras un nivel cualitativo
+    (`thinking_level`). Se consulta el modelo en tiempo de ejecución en lugar de
+    fijar uno, porque enviar el campo equivocado no falla al importar sino al
+    llamar al modelo, es decir, en producción y no en el arranque.
+
+    Devuelve `None` si la versión instalada no admite ninguno de los dos, para
+    que la petición salga con la configuración por defecto en lugar de romper.
+    """
+    campos = getattr(types.ThinkingConfig, "model_fields", {})
+
+    if "thinking_budget" in campos:
+        return types.ThinkingConfig(thinking_budget=presupuesto)
+
+    if "thinking_level" in campos:
+        # Equivalencia aproximada entre presupuesto y nivel: sin presupuesto se
+        # pide el mínimo razonamiento posible, y a partir de ahí se escala.
+        if presupuesto <= 0:
+            nivel = "MINIMAL"
+        elif presupuesto <= 2048:
+            nivel = "LOW"
+        else:
+            nivel = "HIGH"
+        return types.ThinkingConfig(thinking_level=nivel)
+
+    logger.warning(
+        "La versión instalada del SDK no permite ajustar el razonamiento; "
+        "se usa la configuración por defecto del modelo."
+    )
+    return None
+
+
 def config_generacion(**extra: object):
     """Construye la configuración de generación con el presupuesto de razonamiento.
 
     Los modelos de la familia 3.x razonan antes de responder y esos tokens se
-    cobran. Para tareas mecánicas —transcribir una expresión— ese razonamiento
-    encarece y ralentiza sin mejorar el resultado, así que el presupuesto es
-    configurable y se envía sólo cuando está definido.
+    cobran a tarifa de salida. Para tareas mecánicas —transcribir una expresión—
+    ese razonamiento encarece y ralentiza sin mejorar el resultado, así que el
+    presupuesto es configurable y se envía sólo cuando está definido.
     """
     from google.genai import types
 
     presupuesto = settings.gemini_thinking_budget
     if presupuesto is not None:
-        extra["thinking_config"] = types.ThinkingConfig(thinking_budget=presupuesto)
+        configuracion = _config_razonamiento(types, presupuesto)
+        if configuracion is not None:
+            extra["thinking_config"] = configuracion
+
     return types.GenerateContentConfig(**extra)

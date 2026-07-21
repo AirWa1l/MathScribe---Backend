@@ -14,11 +14,16 @@ python-jose[cryptography]==3.*
 passlib[bcrypt]==1.7.*
 
 # Capa de inteligencia
-google-genai==1.*
+# Se fija un mínimo: las versiones anteriores no permiten ajustar el
+# razonamiento del modelo, y pip las instalaría silenciosamente si otra
+# dependencia lo forzara.
+google-genai>=1.75,<2
 sympy==1.13.*
 # Requerido por sympy.parsing.latex para interpretar el LaTeX reconocido.
 antlr4-python3-runtime==4.11.*
-httpx==0.27.*
+# google-genai exige httpx>=0.28.1; con la restricción anterior (0.27.*) pip
+# resolvía el conflicto instalando un google-genai antiguo e incompatible.
+httpx==0.28.*
 
 # Visión open source (preprocesamiento antes del proveedor multimodal)
 # opencv 4.12 exige numpy>=2; se fija 4.10 para mantener compatibilidad con numpy 1.26.
